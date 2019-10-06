@@ -1,0 +1,2 @@
+# Avoid uploading data to the repo.
+*.csv
