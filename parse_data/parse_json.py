@@ -4,8 +4,8 @@ import json
 import pandas as pd
 
 COLUMNS = ['contributors', 'coordinates', 'created_at', 'display_text_range',
-       'favorite_count', 'favorited', 'full_text', 'geo', 'id', 'id_str',
-       'in_reply_to_screen_name', 'in_reply_to_status_id',
+       'favorite_count', 'favorited', 'full_text', 'latitude', 'longitude', 
+       'id', 'id_str', 'in_reply_to_screen_name', 'in_reply_to_status_id',
        'in_reply_to_status_id_str', 'in_reply_to_user_id',
        'in_reply_to_user_id_str', 'is_quote_status', 'lang', 'place',
        'possibly_sensitive', 'retweet_count', 'retweeted', 'source',
@@ -70,6 +70,26 @@ def list_symbols(row):
         texts.append(i['text'])
     return json.dumps(texts)
 
+def convert_date(row):
+    row_date = datetime.strptime(row, '%a %b %d %H:%M:%S %z %Y')
+    return row_date.strftime('%Y-%m-%d %H:%M:%S')
+
+def get_latitude(row):
+    try:
+        return eval(row)['coordinates'][0]
+    except:
+        return None
+    
+
+def get_longitude(row):
+    try:
+        return eval(row)['coordinates'][1]
+    except:
+        return None
+
+def force_string(row):
+    return json.dumps(str(row))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -121,10 +141,21 @@ if __name__ == "__main__":
 
     # Concatentate the 3 dataframes
     df_json_all = pd.concat([df_json, df_entities, df_user], axis=1)
+
+    df_json_all['latitude'] = df_json_all['geo'].map(get_latitude)
+    df_json_all['longitude'] = df_json_all['geo'].map(get_longitude)
     # Add missing columns if needed
     missing = [x for x in COLUMNS if x not in df_json_all.columns]
     for i in missing:
         df_json_all[i] = None
+
+    df_json_all['created_at'] = df_json_all['created_at'].map(convert_date)
+    df_json_all['user_created_at'] = df_json_all['user_created_at'].map(convert_date)
+    df_json_all['in_reply_to_status_id_str'] = df_json_all['in_reply_to_status_id_str'].map(force_string)
+    df_json_all['id_str'] = df_json_all['id_str'].map(force_string)
+    df_json_all['in_reply_to_user_id_str'] = df_json_all['in_reply_to_user_id_str'].map(force_string)
+    df_json_all['quoted_status_id_str'] = df_json_all['quoted_status_id_str'].map(force_string)
+    df_json_all['quoted_status_id'] = df_json_all['quoted_status_id'].map(force_string)
 
     # Save csv file
     df_json_all[COLUMNS].to_csv('{}.csv'.format(file_name), index=False,  header=True,
