@@ -1,5 +1,6 @@
-# Avoid uploading data to the repo.
+# Avoid uploading sensitive data to the repo.
 *.csv
+*.json
 
 # Avoid uploading jupyter checkpoints
 .ipynb_checkpoints
