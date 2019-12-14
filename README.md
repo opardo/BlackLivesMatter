@@ -12,7 +12,7 @@ NLP Analysis of tweets about different murders of black people, which would late
 ## Authors
 
 * Andrea Navarrete Rivera
-* Jose Luis Torres
+* Jose Luis Lopez Torres
 * Omar Pardo Gomez
 * Shadi Fadaee
 * Shimeng Feng
